@@ -1,0 +1,40 @@
+O DISPLAY I2C NÃO FUNCIONA EM CASO DE FALHA DE ALIMENTAÇÃO E RELIGAMENTO DO ARDUINO?
+
+A falta de alimentação durante um funcionamento normal gera uma falha do funcionamento correto do sistema. Seja simplesmente para desalimentar após turno de funcionamento normal ou fruto da falha energética de alimentação. Como o barramento I²C escravo é incapaz de gerar sinal de falha, por apenas receber os dados necessários e trabalha como “dreno aberto”, é incapaz de gerar informações de retorno. Cabe somente ao dispositivo mestre ajustar a sincronia do barramento e informações que por ele trafega. Existem recursos de harware a ser implementado que é o que chamamos de resistores de pull-up, alocados no SCL e DAS do microcontrolador, assim, serão capazes de forçar o funcionamento inicial.
+
+RESET FUNC
+
+Entretanto, podemos implementar recursos no sketch para monitorar o funcionamento. Alguns deles permitem retornar ao endereçamento zero e reiniciar as linhas de programação. Um bom exemplo deste recurso citado é o “void reset”, com a seguinte sintaxe:
+
+void (* resetFunc) (void) = 0;
+void setup() {
+/* Configurações iniciais */
+}
+void loop() {
+//Funções de loop 
+resetFunc(); 	//Comando para reiniciar o sketch a
+//partir do endereço de memória 0.
+}
+
+Este comando pode ser posicionado no final do loop, no entanto, toda vez que completar o loop, a posição “zero” será chamada, reiniciando o microcontrolador.
+
+WATCHDOG TIMER
+
+O outro exemplo, que inclusive bastante eficiente (E REQUER CUIDADOS ESPECIAIS por manipular comandos de timers internos do microcontrolador) é o uso do WatchDog Timer. Como o nome diz, é um “cão de guarda” que, quando bem aplicado, vigia o bom funcionamento das funções. Este recurso requer o uso de uma biblioteca interna da IDE e trabalha bem na correção de falhas. Vamos conhecer a sintaxe:
+
+#include <avr/wdt,h>
+
+setup(){
+//Configurações iniciais
+MCUSR = 0;		//Limpa qualquer flag ou resets prioritários,
+//interrompendo-os
+}
+
+void loop(){
+//Funções e rotinas
+wdt_enable(WDTO_15MS); //Envia o sinal para o WatchDog Timer.
+    //Se não enviado, ele automaticamente
+    //reseta o código.
+}
+
+Estes dois recursos operam no código, exatamente como se pressionássemos o botão físico do reset do Arduino. Com a vantagem do WDT de monitorar o funcionamento, enviando um sinal de controle para o “vigia” caso seja necessário reiniciar o sistema.
