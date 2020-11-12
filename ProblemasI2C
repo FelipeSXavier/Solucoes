@@ -1,6 +1,6 @@
 O DISPLAY I2C NÃO FUNCIONA EM CASO DE FALHA DE ALIMENTAÇÃO E RELIGAMENTO DO ARDUINO?
 
-A falta de alimentação durante um funcionamento normal gera uma falha do funcionamento correto do sistema. 
+A falta de alimentação durante um funcionamento normal gera uma falha do correto funcionamento no sistema. 
 Seja simplesmente para desalimentar após turno de funcionamento normal ou fruto da falha energética de alimentação. 
 Como o barramento I²C escravo é incapaz de gerar sinal de falha, por apenas receber os dados necessários e 
 trabalha como “dreno aberto”, é incapaz de gerar informações de retorno. Cabe somente ao dispositivo mestre 
