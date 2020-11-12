@@ -52,3 +52,31 @@ wdt_enable(WDTO_15MS); //Envia o sinal para o WatchDog Timer.
 Estes dois recursos operam no código, exatamente como se pressionássemos o botão físico do reset do Arduino. 
 Com a vantagem do WDT de monitorar o funcionamento, enviando um sinal de controle para o “vigia” caso seja 
 necessário reiniciar o sistema.
+
+A BOA E VELHA ELETRÔNICA
+
+O problema dos casos acima é o reset do Arduino toda vez que o void loop é cumprido ou quando o uma 
+anormalidade acontece e o tempo de vigia excede. O que pode ocorrer com a possibilidade de uma interrupção
+qualquer que seja ela.
+
+O recurso usado foi um capacitor eletrolítico de 16V 100uF (um de valor menor, mas compatível com o nível de tensão de trabalho
+do Arduino, pode ser aplicado sem problema). A função básica do capacitor é simples: Armazenar energia. No entanto,
+para armazenar energia, ele precisa ser alimentado. Durante este efeito, ele é capaz de atrasar a tensão enquanto
+esta varia na unidade de tempo. Mesmo sendo CC, no instante que a tensão varia até o nível máximo, o capacitor irá
+atuar.
+
+Este atraso é primordial para provocar um reset no Arduino através do seu pino dedicado e assim, forçar o funcionamento
+do circuito uma única vez quando alimentado, sem a necessidade de provocar o reset via software.
+
+Quando ligado, o Arduino carrega a armadura do lado positivo (que está no pino Reset) se carrega com o valor
+da alimentação, o lado negativo logicamente se carrega com pulso contrário. Como a função dele é atrasar o sinal recebido,
+pois precisa ser carregado com o mesmo nível lógico, o pino entenderá como sinal baixo. Assim, ao alimentar, o capacitor
+efetua o reset do sistema por conta do efeito de recarga e assim ficará enquanto estiver alimentado, sem o risco de
+resetar durante o funcionamento, pois como a função do capacitor é armazenar a carga elétrica, o pulso positivo ficará
+disponível nele por uma pequena fração de segundo depois do desligamento.
+
+Pois considerando que os resistores internos do Arduino sejam da ordem de 20.000 Ohms, uma constante de tempo para
+um capacitor de 100uF seria de aproximadamente 2 segundos. Usando valores de base 10 para este cálculo, podemos ter tempos
+de 0,2 segundos para capacitores de 10uF e 0,02 segundos para capacitores de 1uF. O que já acho aceitáve, pois por vezes
+o tempo para o void setup ocorrer, por vezes, supera 1 segundo, ou seja, 5 vezes maior que o tempo adicional necessário para
+o reset usando um capacitor de 10uF.
